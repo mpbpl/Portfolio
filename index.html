@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio CAD 3D</title>
+<style>
+:root{
+  --bg:#0d0e0f;
+  --panel:#15171a;
+  --border:#2b2f33;
+  --text:#d8dbdd;
+  --muted:#8c9297;
+  --green:#0f4d34;
+  --green-hi:#1a6b49;
+  --green-lo:#0a3524;
+  --accent:#c4a032;
+  --font:ui-monospace,"Cascadia Code","SF Mono",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:32px 32px;
+  color:var(--text);
+  line-height:1.6;
+  font-size:15px;
+  padding:2rem 1rem 3rem;
+}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.container{max-width:1040px;margin:0 auto}
+
+/* Naglowek jako tabliczka rysunkowa */
+.titleblock{
+  display:grid;
+  grid-template-columns:1fr auto;
+  border:1px solid var(--border);
+  background:var(--panel);
+  margin-bottom:2.5rem;
+  position:relative;
+}
+.titleblock::before{
+  content:"";
+  position:absolute;left:0;top:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--green-lo),var(--green-hi) 45%,var(--green) 70%,var(--green-lo));
+}
+.tb-main{padding:1.75rem 1.5rem 1.5rem}
+.tb-side{
+  border-left:1px solid var(--border);
+  padding:1.75rem 1.5rem 1.5rem;
+  display:flex;flex-direction:column;gap:1rem;min-width:230px;
+}
+h1{font-size:1.7rem;line-height:1.25;margin-bottom:.6rem;font-weight:700}
+.subtitle{color:var(--muted);max-width:56ch}
+.lang{display:flex;border:1px solid var(--border);align-self:flex-start}
+.lang button{
+  font:inherit;font-size:.85rem;background:transparent;color:var(--muted);
+  border:0;padding:.3rem .8rem;cursor:pointer;
+}
+.lang button+button{border-left:1px solid var(--border)}
+.lang button[aria-pressed="true"]{background:var(--green);color:var(--text)}
+.lang button:hover{color:var(--accent)}
+.links{display:flex;flex-direction:column;gap:.35rem;list-style:none}
+.links a{
+  display:flex;justify-content:space-between;gap:1rem;
+  text-decoration:none;padding:.3rem 0;border-bottom:1px solid var(--border);
+}
+.links a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.links span{color:var(--muted);font-size:.8rem}
+
+/* Sekcja projektow */
+.section-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:1px solid var(--border);padding-bottom:.5rem;margin-bottom:1.5rem;
+}
+.section-head h2{font-size:1.1rem;font-weight:600}
+.section-head .count{color:var(--muted);font-size:.85rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:2px;
+  display:flex;flex-direction:column;position:relative;
+}
+.card.featured{border-color:var(--accent)}
+.badge{
+  position:absolute;top:.6rem;left:.6rem;z-index:1;
+  background:var(--accent);color:#14110a;font-size:.75rem;font-weight:700;
+  padding:.1rem .5rem;
+}
+.thumb{
+  aspect-ratio:16/9;border-bottom:1px solid var(--border);background:#0b0c0d;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb.empty{
+  color:var(--muted);font-size:.85rem;
+  background-image:
+    linear-gradient(rgba(26,107,73,.25) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(26,107,73,.25) 1px,transparent 1px);
+  background-size:20px 20px;
+}
+.body{padding:1.1rem 1.1rem 0;flex-grow:1}
+.tag{color:var(--accent);font-size:.85rem;margin-bottom:.35rem}
+.card h3{font-size:1.1rem;line-height:1.35;margin-bottom:.5rem}
+.card p{color:var(--muted);font-size:.9rem}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;padding:1.1rem}
+.btn{
+  text-decoration:none;font-size:.85rem;font-weight:600;
+  padding:.4rem .85rem;border:1px solid var(--green-hi);
+  background:linear-gradient(135deg,var(--green-lo),var(--green) 60%,var(--green-hi));
+  color:var(--text);transition:border-color .15s,color .15s;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+footer{margin-top:3rem;color:var(--muted);font-size:.8rem;text-align:center}
+
+@media (max-width:720px){
+  .titleblock{grid-template-columns:1fr}
+  .tb-side{border-left:0;border-top:1px solid var(--border);min-width:0}
+  h1{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="titleblock">
+    <div class="tb-main">
+      <h1 id="title"></h1>
+      <p class="subtitle" id="subtitle"></p>
+    </div>
+    <div class="tb-side">
+      <div class="lang" role="group" aria-label="Language / Język">
+        <button type="button" data-lang="pl" aria-pressed="true">PL</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <ul class="links" id="links"></ul>
+    </div>
+  </header>
+
+  <main>
+    <div class="section-head">
+      <h2 id="projects-title"></h2>
+      <span class="count" id="projects-count"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+/* ===== KONFIGURACJA: edytuj tylko ten blok ===== */
+const SITE = {
+  name: "[Twój nick]",
+  email: "twoj@email.pl",
+  links: {
+    github:     "https://github.com/twoj-nick",
+    grabcad:    "https://grabcad.com/twoj-nick",
+    makerworld: "https://makerworld.com/@twoj-nick"
+  }
+};
+
+const UI = {
+  pl: {
+    pageTitle: "Portfolio CAD 3D",
+    hello: "Cześć, tu ",
+    subtitle: "Hobbystyczne projekty CAD 3D i druku 3D. Pliki i repozytoria pod linkami.",
+    contact: "Kontakt",
+    projects: "Projekty",
+    featured: "wyróżnione",
+    noImage: "brak podglądu",
+    count: n => n + " poz.",
+    profiles: { github: "kod i dokumentacja", grabcad: "modele CAD", makerworld: "modele do druku" }
+  },
+  en: {
+    pageTitle: "3D CAD Portfolio",
+    hello: "Hi, I'm ",
+    subtitle: "Hobby 3D CAD and 3D printing projects. Files and repositories linked below.",
+    contact: "Contact",
+    projects: "Projects",
+    featured: "featured",
+    noImage: "no preview",
+    count: n => n + (n === 1 ? " item" : " items"),
+    profiles: { github: "code and docs", grabcad: "CAD models", makerworld: "print models" }
+  }
+};
+
+/* featured: true = żółta ramka i znacznik. Puste "" w links = przycisk się nie pokaże.
+   image: ścieżka do pliku, np. "img/projekt1.jpg"; puste = zaślepka. */
+const PROJECTS = [
+  {
+    featured: true,
+    tag:   { pl: "Kategoria / narzędzie", en: "Category / tool" },
+    title: { pl: "Projekt 1 – tytuł", en: "Project 1 – title" },
+    desc:  { pl: "Krótki opis: co to jest i do czego służy. Edytuj w tablicy PROJECTS.", en: "Short description: what it is and what it is for. Edit in the PROJECTS array." },
+    image: "",
+    links: { github: "https://github.com/twoj-nick/projekt-1", grabcad: "https://grabcad.com/twoj-nick", makerworld: "https://makerworld.com/@twoj-nick" }
+  },
+  {
+    featured: false,
+    tag:   { pl: "Kategoria / narzędzie", en: "Category / tool" },
+    title: { pl: "Projekt 2 – tytuł", en: "Project 2 – title" },
+    desc:  { pl: "Krótki opis projektu.", en: "Short project description." },
+    image: "",
+    links: { github: "", grabcad: "https://grabcad.com/twoj-nick", makerworld: "" }
+  },
+  {
+    featured: false,
+    tag:   { pl: "Kategoria / narzędzie", en: "Category / tool" },
+    title: { pl: "Projekt 3 – tytuł", en: "Project 3 – title" },
+    desc:  { pl: "Krótki opis projektu.", en: "Short project description." },
+    image: "",
+    links: { github: "https://github.com/twoj-nick/projekt-3", grabcad: "", makerworld: "https://makerworld.com/@twoj-nick" }
+  },
+  {
+    featured: false,
+    tag:   { pl: "Kategoria / narzędzie", en: "Category / tool" },
+    title: { pl: "Projekt 4 – tytuł", en: "Project 4 – title" },
+    desc:  { pl: "Krótki opis projektu.", en: "Short project description." },
+    image: "",
+    links: { github: "https://github.com/twoj-nick/projekt-4", grabcad: "", makerworld: "" }
+  }
+];
+/* ===== KONIEC KONFIGURACJI ===== */
+
+const LABELS = { github: "GitHub", grabcad: "GrabCAD", makerworld: "MakerWorld" };
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function link(href, text, cls) {
+  const a = el("a", cls, text);
+  a.href = href;
+  if (/^https?:/.test(href)) { a.target = "_blank"; a.rel = "noopener"; }
+  return a;
+}
+
+function getLang() {
+  try {
+    const s = localStorage.getItem("lang");
+    if (s === "pl" || s === "en") return s;
+  } catch (e) {}
+  return (navigator.language || "pl").toLowerCase().startsWith("pl") ? "pl" : "en";
+}
+
+function render(lang) {
+  const t = UI[lang];
+  document.documentElement.lang = lang;
+  document.title = t.pageTitle;
+  document.getElementById("title").textContent = t.hello + SITE.name;
+  document.getElementById("subtitle").textContent = t.subtitle;
+  document.getElementById("projects-title").textContent = t.projects;
+  document.getElementById("projects-count").textContent = t.count(PROJECTS.length);
+  document.getElementById("footer").textContent = "© " + new Date().getFullYear() + " " + SITE.name;
+
+  document.querySelectorAll(".lang button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+
+  const links = document.getElementById("links");
+  links.replaceChildren();
+  Object.keys(LABELS).forEach(k => {
+    if (!SITE.links[k]) return;
+    const li = el("li");
+    const a = link(SITE.links[k], LABELS[k]);
+    a.appendChild(el("span", null, t.profiles[k]));
+    li.appendChild(a);
+    links.appendChild(li);
+  });
+  if (SITE.email) {
+    const li = el("li");
+    li.appendChild(link("mailto:" + SITE.email, t.contact));
+    links.appendChild(li);
+  }
+
+  const grid = document.getElementById("grid");
+  grid.replaceChildren();
+  PROJECTS.forEach(p => {
+    const card = el("article", "card" + (p.featured ? " featured" : ""));
+    if (p.featured) card.appendChild(el("span", "badge", t.featured));
+
+    let thumb;
+    if (p.image) {
+      thumb = el("div", "thumb");
+      const img = el("img");
+      img.src = p.image;
+      img.alt = p.title[lang];
+      img.loading = "lazy";
+      thumb.appendChild(img);
+    } else {
+      thumb = el("div", "thumb empty", t.noImage);
+    }
+    card.appendChild(thumb);
+
+    const body = el("div", "body");
+    body.appendChild(el("div", "tag", p.tag[lang]));
+    body.appendChild(el("h3", null, p.title[lang]));
+    body.appendChild(el("p", null, p.desc[lang]));
+    card.appendChild(body);
+
+    const actions = el("div", "actions");
+    Object.keys(LABELS).forEach(k => {
+      if (p.links[k]) actions.appendChild(link(p.links[k], LABELS[k], "btn"));
+    });
+    card.appendChild(actions);
+
+    grid.appendChild(card);
+  });
+}
+
+document.querySelectorAll(".lang button").forEach(b =>
+  b.addEventListener("click", () => {
+    try { localStorage.setItem("lang", b.dataset.lang); } catch (e) {}
+    render(b.dataset.lang);
+  }));
+
+render(getLang());
+</script>
+</body>
+</html>
